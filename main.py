@@ -39,10 +39,14 @@ if __name__=='__main__':
     a=np.transpose(np.array(resourceList))
     b=np.array(requireList)
     eq=~np.array(unlockList)
+    a1=np.full((n,n),3)
+    row,col=np.diag_indices_from(a1)
+    a1[row,col]=-2
+    b1=np.zeros(n,)
     x=cp.Variable(n,integer=True)
 
     objective=cp.Minimize(cp.sum(c*x*1/3))
-    constriants=[0<=x,x<=16,a*x>=b,eq*x==0]
+    constriants=[0<=x,x<=16,a*x>=b,eq*x==0,a1*x>=b1]
     prob=cp.Problem(objective,constriants)
     results=prob.solve(solver=cp.CPLEX)
 
