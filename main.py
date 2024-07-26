@@ -1,5 +1,5 @@
-import json,math
 import os,sys
+import json,math
 
 from pathlib import Path
 
@@ -9,16 +9,9 @@ import cvxpy as cp
 class ConfigNotFoundError(FileNotFoundError):
     pass
 
-def generateConfig(filedir:str=None)->bool:
-    pass
-
 if __name__=='__main__':
-    try:
-        with open('config.json','r',encoding='utf-8') as config_file:
-            config=json.load(config_file)
-    except FileNotFoundError:
-        generateConfig(os.path.join((Path(sys.argv[0])).parent,'config.json'))
-        raise ConfigNotFoundError("未找到配置文件,已自动生成，请重新运行")
+    with open('config.json','r',encoding='utf-8') as config_file:
+        config=json.load(config_file)
     
     characters=config['角色']
     characterList=[]
@@ -42,14 +35,14 @@ if __name__=='__main__':
     
     n=len(characterList)
     
-    c=np.ones(n) # Max z = \sigma (-1) * x
+    c=np.ones(n)
     a=np.transpose(np.array(resourceList))
     b=np.array(requireList)
     eq=~np.array(unlockList)
     x=cp.Variable(n,integer=True)
 
     objective=cp.Minimize(cp.sum(c*x*1/3))
-    constriants=[0<=x,a*x>=b,eq*x==0]
+    constriants=[0<=x,x<=16,a*x>=b,eq*x==0]
     prob=cp.Problem(objective,constriants)
     results=prob.solve(solver=cp.CPLEX)
 
